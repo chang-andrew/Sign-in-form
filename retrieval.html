@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>SignIn Data</title>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=900">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="images/icons/favicon.ico" />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <!--===============================================================================================-->
+</head>
+
+<body>
+    <div id="main">
+
+
+
+        <div class="limiter" id="form_sample">
+            <div class="container-table100">
+                <div class="wrap-table100">
+                    <h1>Sign in Sheet</h1>
+                    <button onclick="saveTextAsFile()">Download Data</button>
+                    <!-- <div class="g-savetodrive"
+                        data-src="getFileLink()"
+                        data-filename="exportData.csv"
+                        data-sitename="SignIn Form">
+                    </div> -->
+                    <button onclick="clearData()">Clear Data</button>
+                    <div class="table100 ver1 m-b-110">
+                        <div class="table100-head" id="headerTable"></div>
+                        <div class="table100-body js-pscroll" id="bodyTable"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <script>
+            makeTable();
+
+            function makeTable() {
+                var createTable = document.createElement('table');
+                var x = document.getElementById("headerTable");
+                x.appendChild(createTable);
+                var tableHead = document.createElement('thead');
+                var headerRow = document.createElement('tr');
+                headerRow.setAttribute("class", "row100 head")
+                var nameHeader = document.createElement('th');
+                nameHeader.innerHTML = "Name";
+                nameHeader.setAttribute("class", "cell100 column1");
+                var emailHeader = document.createElement('th');
+                emailHeader.innerHTML = "Email";
+                emailHeader.setAttribute("class", "cell100 column2");
+                var messageHeader = document.createElement('th');
+                messageHeader.innerHTML = "Phone Number";
+                messageHeader.setAttribute("class", "cell100 column2");
+
+                headerRow.appendChild(nameHeader);
+                headerRow.appendChild(emailHeader);
+                headerRow.appendChild(messageHeader);
+                tableHead.appendChild(headerRow);
+                createTable.appendChild(tableHead);
+
+                var createTableBody = document.createElement('table');
+                var tBody = document.createElement('tbody');
+                createTableBody.appendChild(tBody);
+                document.getElementById("bodyTable").appendChild(createTableBody);
+                for (var i = 1; i <= localStorage.personcount; i++) {
+                    var curName = "person" + i;
+                    var curPerson = JSON.parse(localStorage.getItem(curName));
+                    var curRow = document.createElement('tr');
+                    curRow.setAttribute("class", "row100 body");
+                    //cycling through person, adding each td
+                    for (var i1 = 1; i1 <= Object.keys(curPerson).length; i1++) {
+                        var curKey = Object.keys(curPerson)[i1 - 1];
+                        var curD = document.createElement('td');
+                        var className = "cell100 column" + i1;
+                        curD.setAttribute("class", className);
+                        curD.innerHTML = curPerson[curKey];
+                        curRow.appendChild(curD);
+                    }
+                    tBody.appendChild(curRow);
+                }
+            }
+
+            function getData() {
+                var i;
+                var output = "";
+                output += "Name, Email, Phone";
+                for (i = 1; i <= localStorage.personcount; i++) {
+                    var curName = "person" + i;
+                    var curPerson = JSON.parse(localStorage.getItem(curName));
+                    output += curPerson["name"] + "," + curPerson["email"] + "," + curPerson["message"] + "\n";
+                }
+                return output;
+            }
+
+            function getFileLink(){
+                var data = getData();
+                var file = new Blob([data], {type: 'text/plain'});
+                var url = URL.createObjectURL(file);
+               
+                return url;
+            }
+            function saveTextAsFile() {
+                var data = getData();
+                var filename = "exportData.csv";
+                var file = new Blob([data], {type: 'text/plain'});
+                if (window.navigator.msSaveOrOpenBlob) // IE10+
+                    window.navigator.msSaveOrOpenBlob(file, filename);
+                else { // Others
+                    var a = document.createElement("a"),
+                            url = URL.createObjectURL(file);
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function() {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);  
+                    }, 0); 
+                }
+            }
+
+            
+            function clearData() {
+                if (confirm("Are you sure you want to clear data? Data cannot be recovered afterwards")) {
+                    localStorage.clear();
+                    alert("Data has been cleared");
+                    location.reload();
+                }
+            }
+        </script>
+
+    </div>
+</body>
+
+</html>

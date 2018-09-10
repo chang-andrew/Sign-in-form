@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta name=viewport content='width=240'>
+<title>Contact Form using JavaScript</title> 
+<style>
+    @import "http://fonts.googleapis.com/css?family=Ubuntu";
+    div#main{
+    width:100%;
+    height:100%;
+    margin:0 auto;
+    font-family:'Ubuntu',sans-serif
+    }
+    div#form_sample{
+    text-align:center;
+    border:1px solid #ccc;
+    width:300px;
+    padding:0 50px 15px;
+    margin-top:20px;
+    box-shadow:0 0 15px;
+    border-radius:6px;
+    float:left
+    }
+    #main h1{
+    margin-top:40px
+    }
+    hr{
+    margin-top:-5px
+    }
+    label{
+    float:left;
+    font-size:16px
+    }
+    input[type="text"]{
+    width:100%;
+    margin-top:10px;
+    height:35px;
+    margin-bottom:25px;
+    padding:10px;
+    border:3px solid #2BC1F2;
+    }
+    input[type="tel"]{
+    width:100%;
+    margin-top:10px;
+    height:35px;
+    margin-bottom:5px;
+    padding:10px;
+    border:3px solid #2BC1F2;
+    }
+    input[type="email"]{
+    width:100%;
+    margin-top:10px;
+    height:35px;
+    margin-bottom:25px;
+    padding:10px;
+    border:3px solid #2BC1F2
+    }
+    
+    textarea{
+    width:100%;
+    border:3px solid #2BC1F2;
+    padding:10px;
+    margin-bottom:25px;
+    margin-top:10px;
+    height:100px;
+    resize:none
+    }
+    input[type="submit"]{
+    width:100%;
+    padding:10px 45px;
+    background-color:#2BC1F2;
+    border:none;
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:'Ubuntu',sans-serif
+    }
+    /* -------------------------------------
+    CSS for Sidebar (optional)
+    ---------------------------------------- */
+    div#fugo{
+    float:right
+    }
+    button {
+    position: inherit;
+    border: #f7f7f7;
+    background-color: #727272ad;
+    margin-left: 0em;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    cursor:pointer;
+    }
+</style>
+
+</head>
+<body>
+<div id="main">
+<div id="form_sample"></div> 
+
+<script>
+        function clearAllData(){
+            //delete isFirst, currentForm, and all stored values
+            localStorage.removeItem("isFirst");
+            localStorage.removeItem("currentForm");
+            localStorage.removeItem("nameData");
+            localStorage.removeItem("emailData");
+        }
+        //change from US to intl number page
+        function changeType(){
+            //set isFirst to false
+            localStorage.setItem("isFirst", "false");
+            //flip the currentForm
+            if(localStorage.getItem("currentForm") == "0"){
+                localStorage.setItem("currentForm", "1");
+            }
+            else{
+                localStorage.setItem("currentForm", "0");
+            }
+            location.reload();
+        }
+        
+        //save data for name field
+        function saveNameData(text){
+            localStorage.setItem("nameData", text.value);
+        }
+    
+        //save data for email field
+        function saveEmailData(text){
+            localStorage.setItem("emailData", text.value);
+        }
+    
+        //save data to local storage, called on click Submit button
+        function saveData(){
+    
+            //set the person's personal data
+            var name = document.getElementById("dname").value;
+            var email = document.getElementById("demail").value;
+            var message = document.getElementById("dmessage").value;
+            if (name == "") {
+                alert("Please enter a name in first!");
+                return false;
+            }
+    
+            //if we have run the program before, personcount should exist
+            //if is first time running, start the count
+            //we will use this count to give each person a unique id
+            if (localStorage.personcount) {
+                localStorage.personcount = Number(localStorage.personcount) + 1;
+            } else {
+                localStorage.personcount = 1;
+            }
+    
+            //package data into an object for this person
+            var person = {
+                "name" : name,
+                "email" : email,
+                "message" : message
+            };
+            
+            //generate this person's unique name: "person" + ID;
+            var personName = "person" + localStorage.personcount;
+    
+            var personJSON = JSON.stringify(person);
+            console.log(personJSON);
+            //save this person object into localstorage
+            localStorage.setItem(personName, personJSON);
+    
+            clearAllData();
+            alert("Your data has been saved!");
+        }
+    
+        function phoneNo(e,f){
+            var len = f.value.length;
+            var key = getKey(e);
+            //only processes if it is a digit
+            if(key>47 && key<58 && len<13)
+            {
+            if( len==3 )f.value=f.value+'-'
+            else if(len==7 )f.value=f.value+'-'
+            else f.value=f.value;
+            }
+            //else deletes the nondigit character entered
+            else{
+            f.value=f.value.substring(0,len-1);
+            }
+        }
+        //getKey function used in above phoneNo function
+        function getKey(e) {
+            var code;
+            if (!e) var e = window.event;
+            if (e.keyCode) code = e.keyCode;
+            else if (e.which) code = e.which;
+            return code
+            //    return String.fromCharCode(code);
+        }
+    </script>
+
+<script>
+    if(sessionStorage.getItem("isNewSession") == null){
+        clearAllData();
+        sessionStorage.setItem("isNewSession", "no");
+    }
+    if(localStorage.getItem("isFirst") == null){
+        localStorage.setItem("isFirst", "true");
+        localStorage.setItem("currentForm", "0");
+    }
+
+    var x = document.getElementById("form_sample");
+    var createform = document.createElement('form'); // Create New Element Form
+    createform.setAttribute("action", ""); // Setting Action Attribute on Form
+    createform.setAttribute("method", "post"); // Setting Method Attribute on Form
+    createform.setAttribute("onSubmit", "saveData()");
+    createform.setAttribute("autocomplete", "off");
+    x.appendChild(createform);
+
+    var heading = document.createElement('h2'); // Heading of Form
+    heading.innerHTML = "Sign-in Form";
+    createform.appendChild(heading);
+
+    var line = document.createElement('hr'); // Giving Horizontal Row After Heading
+    createform.appendChild(line);
+
+    var linebreak = document.createElement('br');
+    createform.appendChild(linebreak);
+
+    var namelabel = document.createElement('label'); // Create Label for Name Field
+    namelabel.innerHTML = "Your Name : "; // Set Field Labels
+    createform.appendChild(namelabel);
+
+    var inputelement = document.createElement('input'); // Create Input Field for Name
+    inputelement.setAttribute("type", "text");
+    inputelement.setAttribute("name", "dname");
+    inputelement.setAttribute("id", "dname");
+    inputelement.setAttribute("autocapitalize", "words")
+    inputelement.setAttribute("onkeyup", "saveNameData(this)");
+    //if not first, put in the saved data
+    if(localStorage.getItem("isFirst") == "false"){
+        if(localStorage.getItem("nameData") != null){
+            inputelement.setAttribute("value", localStorage.getItem("nameData").valueOf());
+        }
+    }
+    createform.appendChild(inputelement);
+
+    var linebreak = document.createElement('br');
+    createform.appendChild(linebreak);
+
+    var emaillabel = document.createElement('label'); // Create Label for E-mail Field
+    emaillabel.innerHTML = "Your Email : ";
+    createform.appendChild(emaillabel);
+
+    var emailelement = document.createElement('input'); // Create Input Field for E-mail
+    emailelement.setAttribute("type", "email");
+    emailelement.setAttribute("name", "demail");
+    emailelement.setAttribute("id", "demail");
+    emailelement.setAttribute("onkeyup", "saveEmailData(this)");
+    //if not first, put in saved data
+    if(localStorage.getItem("isFirst") == "false"){
+        if(localStorage.getItem("emailData") != null){
+            emailelement.setAttribute("value", localStorage.getItem("emailData").valueOf());
+        }
+    }
+    createform.appendChild(emailelement);
+
+    var emailbreak = document.createElement('br');
+    createform.appendChild(emailbreak);
+
+    var messagelabel = document.createElement('label'); // Append Phone Number Label
+    messagelabel.innerHTML = "Your Phone Number : ";
+    createform.appendChild(messagelabel);
+
+    var texareaelement = document.createElement('input'); // Input for Phone Number
+    texareaelement.setAttribute("type", "tel");
+    texareaelement.setAttribute("name", "dmessage");
+    texareaelement.setAttribute("id", "dmessage");
+    if(localStorage.getItem("currentForm") == "0"){
+        texareaelement.setAttribute("placeholder", "ex: 111-111-1111");
+        texareaelement.setAttribute("onkeyup", "phoneNo(event,this)");
+    }
+    
+    createform.appendChild(texareaelement);
+    
+    var intlNumButton = document.createElement('button');//button to change to intl number
+    intlNumButton.setAttribute("type", "button");
+    intlNumButton.setAttribute("onclick", "changeType()");
+    if(localStorage.getItem("currentForm") == "0"){
+        intlNumButton.innerHTML = "Click here if you have international/non-U.S number";
+    }
+    else{
+        intlNumButton.innerHTML = "Return to U.S. phone number option"
+    }
+    createform.appendChild(intlNumButton);
+
+    var messagebreak = document.createElement('br');
+    createform.appendChild(messagebreak);
+
+    var submitelement = document.createElement('input'); // Append Submit Button
+    submitelement.setAttribute("type", "submit");
+    submitelement.setAttribute("name", "dsubmit");
+    submitelement.setAttribute("value", "Submit");
+    createform.appendChild(submitelement);
+   
+    
+</script>
+
+
+
+</div>
+</body>
+</html>
